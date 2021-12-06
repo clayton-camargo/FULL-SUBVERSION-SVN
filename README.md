@@ -153,6 +153,23 @@ Deve-se criar um arquivo de vínculo entre usuários e projetos no diretório /u
 admin =  claytoncamargo #Participantes que terão acesso full a todos os projetos#
  
 #FIM-GRUPOS
-#-------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------
 
+```
+
+### 6.2. Script cria usuários
+Para de adicionar usuários deve-se criar um script dentro do diretório /root com o nome [`cria-usuario´]() e adicionar os seguintes paramentos:
+
+**~# vi cria-usuarios**
+```
+#!/bin/bash
+
+# Script para gerar usuarios e senhas para os sistemas
+# Autor: Clayton Camargo
+# Data: 12/03/2019
+
+USUARIO=$( dialog --stdout --inputbox 'Digite o nome do usuario(ex.: claytoncamargo)' 0 45 )
+SENHA=$( dialog --stdout --inputbox 'Digite a senha(ex.: batatinha@123)' 0 45 )
+
+htpasswd -mb /etc/apache2/dav_svn.passwd $USUARIO $SENHA
 ```
