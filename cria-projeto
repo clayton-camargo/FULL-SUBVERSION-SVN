@@ -68,13 +68,6 @@ sed -i "/<!FIM-GRUPOS>/i <a href=/integrantes/$PROJETO.html title=Projeto>$PROJE
 mkdir -p /tmp/$PROJETO
 #touch /tmp/$PROJETO/LEIAME.txt
 
-#echo "Esse e o repositorio do projeto: $PROJETO." >> /tmp/$PROJETO/LEIAME.txt
-#echo "" >> /tmp/$PROJETO/LEIAME.txt
-#echo "Qualquer duvida contate o administrador do sistema." >> /tmp/$PROJETO/LEIAME.txt
-#echo "Contato: dti@chiptronic.com.br" >> /tmp/$PROJETO/LEIAME.txt
-#echo "" >> /tmp/$PROJETO/LEIAME.txt
-#echo "Esse arquivo foi gerado de forma automatica." >> /tmp/$PROJETO/LEIAME.txt
-
 # Colocando o diretorio no SVN
 svnadmin create /var/lib/svn/$PROJETO
 
