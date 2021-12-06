@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Script de backup dos projetos SVN e TRAC
+# Autor: Clayton Camargo
+# Data: 11/03/2019
+# Modificado: 11/02/2019
+
+
+DIR_PATH="/var/lib/svn/"
+
+        # Fazer backup de todos os projetos do diretorio do subversion
+        for projeto in `ls $DIR_PATH`; do
+
+		echo "$projeto" >> projetos.txt
+
+                if [ $? == 0 ]; then
+                        echo -n -e " OK!\n"
+                else
+                        echo -n -e " Fail\n"
+                fi
+        done
+
+
+        echo -n -e "\n *** Finalizando backup *** \n\n"
+
+
