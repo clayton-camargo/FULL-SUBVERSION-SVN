@@ -158,7 +158,7 @@ admin =  claytoncamargo #Participantes que terão acesso full a todos os projeto
 ```
 
 ### 6.2. Script cria usuários
-Para de adicionar usuários deve-se criar um script dentro do diretório /root com o nome [`cria-usuario´]() e adicionar os seguintes paramentos:
+Para adcionar usuários deve-se criar um script dentro do diretório /root com o nome [`cria-usuarios`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/cria-usuarios) e adicionar os seguintes paramentos:
 
 **~# vi cria-usuarios**
 ```
@@ -166,10 +166,15 @@ Para de adicionar usuários deve-se criar um script dentro do diretório /root c
 
 # Script para gerar usuarios e senhas para os sistemas
 # Autor: Clayton Camargo
-# Data: 12/03/2019
+# Data: 06/12/2021
 
-USUARIO=$( dialog --stdout --inputbox 'Digite o nome do usuario(ex.: claytoncamargo)' 0 45 )
-SENHA=$( dialog --stdout --inputbox 'Digite a senha(ex.: batatinha@123)' 0 45 )
+USUARIO=$( dialog --stdout --inputbox 'Digite o nome do usuario(ex.: clayton.camargo)' 0 45 )
+SENHA=$( dialog --stdout --inputbox 'Digite a senha(ex.: yourpass#2021)' 0 45 )
 
 htpasswd -mb /etc/apache2/dav_svn.passwd $USUARIO $SENHA
 ```
+**~# chmod +x cria-usuarios**
+
+>_Este comando tonará o script cria-usuarios executável._
+
+>_Para executar o script, no diretório /root digite o comando `./cria-usuarios`. A execução deste script abrirá uma caixa de diálogo no qual deve-se inserir o nome e senha do usuário a ser criado. Ao informar as credenciais do usuário, este será adcionado de forma criptografada ao diretório /etc/apache2/dav_svn.passwd._
