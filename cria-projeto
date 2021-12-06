@@ -122,10 +122,10 @@ sed -i 25,31d /var/lib/trac/$PROJETO/conf/trac.ini
 sed -i '/.type = svn/a .sync_per_request = true' /var/lib/trac/$PROJETO/conf/trac.ini
 
 echo "[header_logo]" >> /var/lib/trac/$PROJETO/conf/trac.ini 
-echo "alt = CHIPTRONIC" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo "alt = MYCOMP" >> /var/lib/trac/$PROJETO/conf/trac.ini 
 echo "height = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini
-echo "link = https://chiptronic.com.br/site/br/home" >> /var/lib/trac/$PROJETO/conf/trac.ini
-echo "src = https://zenprospect-production.s3.amazonaws.com/uploads/pictures/5d3d9c0aa3ae614e2d7a52ec/picture" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "link = https://github.com/clayton-camargo" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "src = https://icones.pro/wp-content/uploads/2021/06/icone-github-bleu.png" >> /var/lib/trac/$PROJETO/conf/trac.ini
 echo "width = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini 
 echo  >> /var/lib/trac/$PROJETO/conf/trac.ini
 
