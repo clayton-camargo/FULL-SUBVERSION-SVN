@@ -45,7 +45,7 @@ deb-src http://debian.c3sl.ufpr.br/debian/ buster-updates main contrib non-free
 
 ### 2.4 Configurando o VIM ###
 
-Altere o conteúdo do arquivo .bashrc que fica localizado ocultamente no diretório /root com o seguinte conteúdo [`.bashrc`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/bashrc) e por fim descomentar a linha “sintax on no diretório /etc/vim/vimrc.
+Altere o conteúdo do arquivo .bashrc que fica localizado ocultamente no diretório /root com o seguinte conteúdo [`.bashrc`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/bashrc) e por fim descomentar a linha `sintax on` no diretório /etc/vim/vimrc.
 
 
 ### 2.5 Instalando pacotes necessários para SVN e TRAC ###
@@ -60,7 +60,7 @@ Altere o conteúdo do arquivo .bashrc que fica localizado ocultamente no diretó
 
 
 ## 3.	CONFIGURAÇÃO DO APACHE
-Edite o arquivo default.conf com os seguintes dados:
+Edite o arquivo [`default.conf`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/default.conf) com os seguintes dados:
 
 **~# vi /etc/apache2/sites-available/default.conf**
 ```
@@ -81,4 +81,29 @@ Edite o arquivo default.conf com os seguintes dados:
         </Directory>
 
 </VirtualHost>
+```
+
+
+## 4. CONFIGURAÇÃO DO SVN
+Crie um arquivo [`svn.conf`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/svn.conf) dentro de /etc/apache/sites-available:
+
+**~# vi /etc/apache2/sites-available/svn.conf**
+>_Insira o conteúdo dentro de svn.conf:_
+```
+<Location /svn>
+        DAV svn
+        SVNParentPath /var/lib/svn
+        AuthzSVNAccessFile /usr/local/etc/svn_authz.conf
+        Satisfy Any
+        Require valid-user
+        AuthType Basic
+        AuthName "Repositorios SVN"
+        AuthUserFile /etc/apache2/dav_svn.passwd
+</Location>
+
+<Directory /var/lib/svn>
+        AllowOverride None
+        Order Deny,Allow
+        Allow from all
+</Directory>
 ```
