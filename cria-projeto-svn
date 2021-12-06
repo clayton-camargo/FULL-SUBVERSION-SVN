@@ -1,0 +1,107 @@
+#!/bin/bash
+
+# Script para gerar o diretorio svn e trac para projeto
+# Autor: CLAYTON CAMARGO
+
+# Dialog para pegar o nome do projeto
+PROJETO=$( dialog --stdout --inputbox 'Digite o nome do projeto (ex.: TI-CHIPTRONIC)' 0 45 )
+#NOMETRAC=$( dialog --stdout --inputbox 'Digite o nome do TRAC (ex.: TI CHIPTRONIC)' 0 45 )
+NOME_INTEGRANTES=$( dialog --stdout --inputbox 'Digite o(s) nome(s) do(s) integrante(s) do Projeto (ex.: Clayton Camargo, Heitor Polizeli)' 0 45 )
+USER_INTEGRANTES=$( dialog --stdout --inputbox 'Digite o(s) login(s) do(s) integrante(s) do Projeto (ex.: claytoncamargo, heitorpolizeli)' 0 45 )
+
+NOME_GRUPO=${PROJETO,,}
+
+CAMINHO="/var/lib/svn/$PROJETO"
+DB="sqlite:db/trac.db"
+REPOSTYPE=svn
+
+# Corrigir problemas com nomes de arquivos
+export LC_CTYPE=pt_BR.UTF-8
+
+# Criando o diretorio de projeto
+mkdir -p /var/lib/svn/$PROJETO
+
+# Criando diretorio com um arquivo vazio para importacao inicial
+mkdir -p /tmp/$PROJETO
+#touch /tmp/$PROJETO/LEIAME.txt
+
+# Colocando o diretorio no SVN
+svnadmin create /var/lib/svn/$PROJETO
+
+# Importacao inicial
+svn import /tmp/$PROJETO file:///var/lib/svn/$PROJETO -m "Importacao inicial"
+rm -rf /tmp/$PROJETO
+
+# Permissoes para o svn
+chown -R www-data:www-data /var/lib/svn/$PROJETO
+chmod -R 770 /var/lib/svn/$PROJETO
+
+# Criando o trac para o projeto
+mkdir -p /var/lib/trac/$PROJETO
+trac-admin /var/lib/trac/$PROJETO initenv "$PROJETO" $DB $REPOSTYPE $CAMINHO
+
+# Permissoes para o trac
+find /var/lib/trac/$PROJETO -type f -exec chmod 660 {} \;
+find /var/lib/trac/$PROJETO -type d -exec chmod 2770 {} \;
+chown -R www-data.www-data /var/lib/trac/$PROJETO
+
+# Remove permissoes de anonymous
+trac-admin /var/lib/trac/$PROJETO permission remove anonymous '*'
+trac-admin /var/lib/trac/$PROJETO permission add anonymous WIKI_VIEW CHANGESET_VIEW FILE_VIEW LOG_VIEW MILESTONE_VIEW REPORT_SQL_VIEW REPORT_VIEW ROADMAP_VIEW SEARCH_VIEW TICKET_VIEW TIMELINE_VIEW
+
+# Permissao de super-usuario para o administrador de TI
+trac-admin /var/lib/trac/$PROJETO permission add claytoncamargo TRAC_ADMIN
+trac-admin /var/lib/trac/$PROJETO permission add heitorpolizeli TRAC_ADMIN
+trac-admin /var/lib/trac/$PROJETO permission add joaovilan TRAC_ADMIN
+
+# Remover milestones padroes
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone1
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone2
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone3
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone4
+
+# Alterando as prioridades padroes
+trac-admin /var/lib/trac/$PROJETO priority change blocker autíssima
+trac-admin /var/lib/trac/$PROJETO priority change critical critica
+trac-admin /var/lib/trac/$PROJETO priority change major alta
+trac-admin /var/lib/trac/$PROJETO priority change minor mínima
+
+# Alterando os tipos de ticket
+trac-admin /var/lib/trac/$PROJETO ticket_type change defect defeito
+trac-admin /var/lib/trac/$PROJETO ticket_type change enhancement etapa
+trac-admin /var/lib/trac/$PROJETO ticket_type change task tarefa
+
+# Removendo componentes
+trac-admin /var/lib/trac/$PROJETO component remove component1
+trac-admin /var/lib/trac/$PROJETO component remove component2
+
+sed -i 25,31d /var/lib/trac/$PROJETO/conf/trac.ini
+sed -i '/.type = svn/a .sync_per_request = true' /var/lib/trac/$PROJETO/conf/trac.ini
+
+echo "[header_logo]" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo "alt = CHIPTRONIC" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo "height = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "link = https://chiptronic.com.br/site/br/home" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "src = https://zenprospect-production.s3.amazonaws.com/uploads/pictures/5d3d9c0aa3ae614e2d7a52ec/picture" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "width = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo  >> /var/lib/trac/$PROJETO/conf/trac.ini
+
+echo "[components]" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "tracopt.versioncontrol.svn.* = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo "trac.versioncontrol.api.repositorymanager = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "trac.versioncontrol.svn_authz.svnauthzoptions = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "trac.versioncontrol.svn_fs.subversionconnector = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+
+# Resincronizando para evitar erros
+trac-admin /var/lib/trac/$PROJETO repository sync "*"
+
+# Colocar entrada no arquivo de permissoes do svn
+sed -i "/#FIM-GRUPOS/i ## PROJETO $PROJETO ##" /usr/local/etc/svn_authz.conf
+sed -i "/#FIM-GRUPOS/i ## Integrantes do Projeto $PROJETO: $NOME_INTEGRANTES ##" /usr/local/etc/svn_authz.conf
+sed -i "/#FIM-GRUPOS/i $NOME_GRUPO = $USER_INTEGRANTES\n" /usr/local/etc/svn_authz.conf
+
+echo "########################################-- REPOSITORIO: $PROJETO -- ########################################" >> /usr/local/etc/svn_authz.conf
+echo "[$PROJETO:/]" >> /usr/local/etc/svn_authz.conf
+echo "@admin = rw" >> /usr/local/etc/svn_authz.conf
+echo "@$NOME_GRUPO = rw" >> /usr/local/etc/svn_authz.conf
+echo "" >> /usr/local/etc/svn_authz.conf
