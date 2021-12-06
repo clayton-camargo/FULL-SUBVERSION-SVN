@@ -141,3 +141,18 @@ Crie um arquivo [`trac.conf`](https://github.com/clayton-camargo/FULL-SUBVERSION
 ```
 ### 5.1. Ativar o host virtual de Trac
 **~# a2ensite trac.conf**
+
+## 6. SCRIPTS
+### 6.1. Arquivo de vínculos
+
+Deve-se criar um arquivo de vínculo entre usuários e projetos no diretório /usr/local/etc/ com o nome [`svn_authz.conf`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/svn_authz.conf) seguindo o padrão abaixo:
+
+**~# vi /usr/local/etc/svn_authz.conf**
+```
+[groups]
+admin =  claytoncamargo #Participantes que terão acesso full a todos os projetos#
+ 
+#FIM-GRUPOS
+#-------------------------------------------------------------------------------------------------------------------------------------------
+
+```
