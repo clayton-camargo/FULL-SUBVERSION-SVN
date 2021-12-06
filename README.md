@@ -38,3 +38,8 @@ deb-src http://debian.c3sl.ufpr.br/debian/ buster-updates main contrib non-free
 **~# apt-get install dialog**
 
 >_“permite criação de projeto e usuário de forma interativa”_
+
+
+### 2.4 Configurando o VIM ###
+
+>_“Altere o conteúdo do arquivo .bashrc que fica localizado ocultamente no diretório /root com o seguinte conteúdo .bashrc e por fim descomentar a linha “sintax on no diretório /etc/vim/vimrc._"
