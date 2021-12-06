@@ -25,6 +25,16 @@ deb-src http://debian.c3sl.ufpr.br/debian/ buster-updates main contrib non-free
 
 ### 2.2 Atualizar o sistema
 
-**~# apt-get update -y && apt-get upgrade -y**
+**~# apt update -y && apt upgrade -y**
 
-apt-get update atualiza a lista de pacotes e programas que podem ser instalados na máquina | apt-get upgrade atualiza o sistema e baixa e instala atualizações de pacotes e dos programas da máquina.
+`apt update` atualiza a lista de pacotes e programas que podem ser instalados na máquina | `apt upgrade` atualiza o sistema e baixa e instala atualizações de pacotes e dos programas da máquina.
+
+### 2.3 Instalação de pacotes necessários
+
+**~# apt-get install vim**
+
+>_"instala o editor de texto vi"_
+
+**~# apt-get install dialog**
+
+>_“permite criação de projeto e usuário de forma interativa”_
