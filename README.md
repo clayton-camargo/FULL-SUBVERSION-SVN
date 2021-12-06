@@ -8,6 +8,6 @@ Scripts para automatizar alguns processos também estão disponibilizados neste 
 # 2. INSTALAÇÃO DO SISTEMA
 Recomenda-se a instalação da distribuição no formatado LVM. Definindo o Volume lógico pelo menos a estrutura de diretório "/var", pois será nessa estrutura onde alocaremos os projetos.
 
-2.1 **Preparação do sistema
+### 2.1 Preparação do sistema
 Inclusão das linhas no arquivo /etc/apt/sources.list
 ~# nano /etc/apt/sources.list
