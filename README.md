@@ -107,3 +107,37 @@ Crie um arquivo [`svn.conf`](https://github.com/clayton-camargo/FULL-SUBVERSION-
         Allow from all
 </Directory>
 ```
+### 4.1. Ativar o host virtual de subversão
+
+**~# a2ensite svn.conf**
+
+## 5. CONFIGURAÇÃO DO TRAC
+Trac é um sistema de rastreamento de problemas e wiki aprimorado para projetos de desenvolvimento de software. A Trac usa uma abordagem minimalista para gerenciamento de projetos de software baseado na Web.
+
+Ele fornece uma interface para Subversão e Git, uma Wiki integrada e instalações de relatórios convenientes.
+
+Crie um arquivo [`trac.conf`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/trac.conf) dentro de /etc/apache/sites-available:
+
+**~# vi /etc/apache2/sites-available/trac.conf**
+
+>_Insira o conteúdo dentro de trac.conf:_
+```
+<Location /projetos>
+        SetHandler mod_python
+        PythonHandler trac.web.modpython_frontend
+        PythonOption TracEnvParentDir /var/lib/trac/
+        PythonOption TracUriRoot /projetos
+        PythonPath "sys.path + ['/usr/local/lib/python2.7/site-packages/trac']"
+        SetEnv PYTHON_EGG_CACHE /usr/local/lib/python2.7/site-packages/
+        #PythonDebug On # apenas em caso de problemas
+</Location>
+
+<LocationMatch "/projetos/[^/]+/login">
+        AuthName "Gerenciador de Projetos Trac"
+        AuthType Basic
+        Require valid-user
+        AuthUserFile /etc/apache2/dav_svn.passwd
+</LocationMatch>
+```
+### 5.1. Ativar o host virtual de Trac
+**~# a2ensite trac.conf**
