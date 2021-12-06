@@ -178,3 +178,13 @@ htpasswd -mb /etc/apache2/dav_svn.passwd $USUARIO $SENHA
 >_Este comando tonará o script cria-usuarios executável._
 
 >_Para executar o script, no diretório /root digite o comando `./cria-usuarios`. A execução deste script abrirá uma caixa de diálogo no qual deve-se inserir o nome e senha do usuário a ser criado. Ao informar as credenciais do usuário, este será adcionado de forma criptografada ao diretório /etc/apache2/dav_svn.passwd._
+
+
+### 6.3 Script cria projeto
+
+Agora, para criar os projetos deve-se primeiramente criar um script dentro do diretório /root com o nome [`cria-projeto`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/cria-projeto) e adicionar os seguintes parâmetros:
+
+**~# vi cria-projeto**
+```
+
+```
