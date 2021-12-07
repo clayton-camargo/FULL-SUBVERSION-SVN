@@ -484,6 +484,13 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 
 ## 8. RESTAURAÇÃO DE BACKUP
+O script a seguir possibilitará a restauração do backup em novo equipamento caso ocorra a necessidade. Este script possibilita analisar os projetos existentes no diretório de backup e de forma automática recriar os projetos SVN e sincronizar o TRAC dos projetos.
+
+>_•Nota: É importante rotineiramente copiar os arquivos `svn_authz.conf` e  `dav_svn.passwd` para posteriormente voltar no equipamento novo._
+
+No equipamanto a ser restaurado o backup dos projetos, deverá ser criado em /etc/usr/local/bin um script com o nome [`restory_svn`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/restory_svn) e inserido as seguintes informações:
+
+**~# vi /etc/usr/local/bin/restory_svn**
 
 ```
 #!/bin/bash
@@ -624,3 +631,7 @@ done
 
         echo -n -e "\n *** Finalizando restauracao dos projetos*** \n\n"
 ````
+
+**~# chmod +x restory_svn**
+
+>_Este comando tonará o script restory_svn executável._
