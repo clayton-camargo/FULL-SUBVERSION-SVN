@@ -344,9 +344,20 @@ echo "" >> /usr/local/etc/svn_authz.conf
 
 >_Para executar o script, no diretório /root digite o comando `./cria-projetos`. A execução deste script abrirá uma caixa de diálogo no qual solicitará que seja inserido o nome do projeto a ser criado, assim como o nome de referência para o TRAC, nome(s) e login(s) do(s) usuário(s) pertencentes ao referente projeto. Após a execução do script, será criado o projeto no diretório /var/lib/svn/”nome-projeto” e será adicionado as referências deste projeto no arquivo svn_authz.conf em /usr/local/etc/._
 
->_Pronto, se tudo ocorreu da forma desejada, o SVN está agora configurado e funcionando. Para testar sua efetividade acesse o navegador e insira o seguinte endereço:
+>_•	Pronto, se tudo ocorreu da forma desejada, o SVN está agora configurado e funcionando. Para testar sua efetividade acesse o navegador e insira o seguinte endereço:
 http://IPSERVIDOR/svn/NOME-PROJETO_
 
->_Para se testar a funcionalidade do TRAC, acesse o navegador e insira o seguinte endereço:
+>_•	Para se testar a funcionalidade do TRAC, acesse o navegador e insira o seguinte endereço:
 http://IPSERVIDOR/projetos/NOME-PROJETO_
 
+
+## 7. BACKUPS PROJETOS SVN E CONFIGURAÇÕES DO SISTEMA
+### 7.1. Backup SVN
+Agora que o sistema está configurado e funcionando corretamente é necessário configurarmos as rotinas de backup. Para isso, o primeiro passo é criar um script de backup que irá fazer um dump dos projetos SVN e salvá-los em algum dispositivo externo.
+
+Este script tem a função de fazer backup Full para os projetos novos e incremental para os projetos já existente. Por exemplo, a primeira vez que o script for executado, ele criará um backup completo de todos os projetos existentes, e posteriormente criará backups incrementais apenas das modificações de cada projeto. 
+
+Segue abaixo definição do script:
+
+Este script ficará alocado no diretorio /etc/usr/local/bin com o nome 
+~# cd /etc/usr/local/bin
