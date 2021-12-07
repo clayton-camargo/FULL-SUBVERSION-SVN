@@ -186,5 +186,178 @@ Agora, para criar os projetos deve-se primeiramente criar um script dentro do di
 
 **~# vi cria-projeto**
 ```
+#!/bin/bash
 
+# Script para gerar o diretorio svn e trac para projeto
+# Autor: CLAYTON CAMARGO
+
+# Dialog para pegar o nome do projeto
+PROJETO=$( dialog --stdout --inputbox 'Digite o nome do projeto (ex.: DSV-XPTO)' 0 45 )
+NOMETRAC=$( dialog --stdout --inputbox 'Digite o nome do TRAC (ex.: DSV XPTO)' 0 45 )
+NOME_INTEGRANTES=$( dialog --stdout --inputbox 'Digite o(s) nome(s) do(s) integrante(s) do Projeto (ex.: Clayton Camargo)' 0 45 )
+USER_INTEGRANTES=$( dialog --stdout --inputbox 'Digite o(s) login(s) do(s) integrante(s) do Projeto (ex.: clayton.camargo)' 0 45 )
+
+NOME_GRUPO=${PROJETO,,}
+DIR_INI=${DIRETORIO_INICIAL,,}
+
+CAMINHO="/var/lib/svn/$PROJETO"
+DB="sqlite:db/trac.db"
+REPOSTYPE=svn
+
+# Criando o diretorio de projeto
+mkdir -p /var/lib/svn/$PROJETO
+
+touch /var/www/html/integrantes/$PROJETO.html
+
+echo "<!DOCTYPE html>" > /var/www/html/integrantes/$PROJETO.html
+echo "<html lang="pt-BR">" >> /var/www/html/integrantes/$PROJETO.html
+echo "<head>" >> /var/www/html/integrantes/$PROJETO.html
+echo    "<meta charset="UTF-8">" >> /var/www/html/integrantes/$PROJETO.html
+echo    "<meta name="viewport" content="width=device-width, initial-scale=1.0">" >> /var/www/html/integrantes/$PROJETO.html
+#echo	"<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC' crossorigin='anonymous'>" >> /var/www/html/integrantes/$PROJETO.html 
+echo    "<title>PROJETO $PROJETO</title>" >> /var/www/html/integrantes/$PROJETO.html
+echo "</head>" >> /var/www/html/integrantes/$PROJETO.html
+echo "<body>" >> /var/www/html/integrantes/$PROJETO.html
+echo    "<h1>INFORMAÇÕES DO PROJETO $PROJETO</h1>" >> /var/www/html/integrantes/$PROJETO.html
+echo    "<style type="text/css">" >> /var/www/html/integrantes/$PROJETO.html
+echo        "h1 {" >> /var/www/html/integrantes/$PROJETO.html
+echo            "color:blue;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "text-transform: uppercase;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "width: 900px;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "font-size: x-large;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "font-family: verdana;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "text-align: center;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "text-decoration: underline;" >> /var/www/html/integrantes/$PROJETO.html
+echo           "}" >> /var/www/html/integrantes/$PROJETO.html
+echo    "</style>" >> /var/www/html/integrantes/$PROJETO.html
+echo "</head>" >> /var/www/html/integrantes/$PROJETO.html
+echo "<body>" >> /var/www/html/integrantes/$PROJETO.html
+echo    "<p>## Projeto = $PROJETO</p>" >> /var/www/html/integrantes/$PROJETO.html
+echo    "<p>## Integrantes do Projeto $PROJETO = $NOME_INTEGRANTES</p>" >> /var/www/html/integrantes/$PROJETO.html
+echo    "<p>## Credenciais dos Integrantes do Projeto $PROJETO = $USER_INTEGRANTES</p>" >> /var/www/html/integrantes/$PROJETO.html
+echo         "<style type="text/css">" >> /var/www/html/integrantes/$PROJETO.html
+echo        "p {" >> /var/www/html/integrantes/$PROJETO.html
+echo           "color:black;" >> /var/www/html/integrantes/$PROJETO.html
+#echo            "text-transform: uppercase;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "width: 900px;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "font-size: 15px;" >> /var/www/html/integrantes/$PROJETO.html
+echo            "font-family: arial;" >> /var/www/html/integrantes/$PROJETO.html
+echo       "}" >> /var/www/html/integrantes/$PROJETO.html
+echo    "</style>" >> /var/www/html/integrantes/$PROJETO.html
+echo "</head>" >> /var/www/html/integrantes/$PROJETO.html
+echo "</body>" >> /var/www/html/integrantes/$PROJETO.html
+echo "</html>" >> /var/www/html/integrantes/$PROJETO.html
+echo "<feff>" >> /var/www/html/integrantes/$PROJETO.html
+# Colocar entrada no arquivo de permissoes do svn
+sed -i "/<!FIM-GRUPOS>/i </li><li>" /var/www/html/integrantes/index.html
+sed -i "/<!FIM-GRUPOS>/i <a href=/integrantes/$PROJETO.html title=Projeto>$PROJETO</a>" /var/www/html/integrantes/index.html
+
+# Criando diretorio com um arquivo vazio para importacao inicial
+mkdir -p /tmp/$PROJETO
+#touch /tmp/$PROJETO/LEIAME.txt
+
+# Colocando o diretorio no SVN
+svnadmin create /var/lib/svn/$PROJETO
+
+# Importacao inicial
+svn import /tmp/$PROJETO file:///var/lib/svn/$PROJETO -m "Importacao inicial"
+rm -rf /tmp/$PROJETO
+
+# Permissoes para o svn
+chown -R www-data:www-data /var/lib/svn/$PROJETO
+chmod -R 770 /var/lib/svn/$PROJETO
+
+# Criando o trac para o projeto
+mkdir -p /var/lib/trac/$PROJETO
+trac-admin /var/lib/trac/$PROJETO initenv "$NOMETRAC" $DB $REPOSTYPE $CAMINHO
+
+# Permissoes para o trac
+find /var/lib/trac/$PROJETO -type f -exec chmod 660 {} \;
+find /var/lib/trac/$PROJETO -type d -exec chmod 2770 {} \;
+chown -R www-data.www-data /var/lib/trac/$PROJETO
+
+# Permissao de super-usuario para o administrador de TI
+trac-admin /var/lib/trac/$PROJETO permission add claytoncamargo TRAC_ADMIN TICKET_ADMIN
+
+# Permissao de anonymous
+trac-admin /var/lib/trac/$PROJETO permission add anonymous BROWSER_VIEW
+
+# Remove permissoes de anonymous
+trac-admin /var/lib/trac/$PROJETO permission remove anonymous CHANGESET_VIEW FILE_VIEW LOG_VIEW MILESTONE_VIEW REPORT_SQL_VIEW REPORT_VIEW ROADMAP_VIEW SEARCH_VIEW TICKET_VIEW TIMELINE_VIEW WIKI_VIEW
+
+# Remover milestones padroes
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone1
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone2
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone3
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone4
+
+# Alterando as prioridades padroes
+trac-admin /var/lib/trac/$PROJETO priority change blocker autissima
+trac-admin /var/lib/trac/$PROJETO priority change critical critica
+trac-admin /var/lib/trac/$PROJETO priority change major alta
+trac-admin /var/lib/trac/$PROJETO priority change minor minima
+
+# Alterando os tipos de ticket
+trac-admin /var/lib/trac/$PROJETO ticket_type change defect defeito
+trac-admin /var/lib/trac/$PROJETO ticket_type change enhancement etapa
+trac-admin /var/lib/trac/$PROJETO ticket_type change task tarefa
+
+# Removendo componentes
+trac-admin /var/lib/trac/$PROJETO component remove component1
+trac-admin /var/lib/trac/$PROJETO component remove component2
+
+sed -i 25,31d /var/lib/trac/$PROJETO/conf/trac.ini
+sed -i '/.type = svn/a .sync_per_request = true' /var/lib/trac/$PROJETO/conf/trac.ini
+
+echo "[header_logo]" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo "alt = MYCOMP" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo "height = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "link = https://www.linkedin.com/in/clayton-camargo-oliveira-463ba9105/" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "src = https://raw.githubusercontent.com/clayton-camargo/FULL-SUBVERSION-SVN/main/Icone%20clayton.png" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "width = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo  >> /var/lib/trac/$PROJETO/conf/trac.ini
+
+echo "[components]" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "tracopt.versioncontrol.svn.* = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini 
+echo "trac.versioncontrol.api.repositorymanager = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "trac.versioncontrol.svn_authz.svnauthzoptions = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "trac.versioncontrol.svn_fs.subversionconnector = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+
+# Resincronizando para evitar erros
+trac-admin /var/lib/trac/$PROJETO repository sync "*"
+
+# Colocar entrada no arquivo de permissoes do svn
+sed -i "/#FIM-GRUPOS/i ## Grupo: $PROJETO ##" /usr/local/etc/svn_authz.conf
+sed -i "/#FIM-GRUPOS/i ## $NOME_INTEGRANTES ##" /usr/local/etc/svn_authz.conf
+sed -i "/#FIM-GRUPOS/i $NOME_GRUPO = $USER_INTEGRANTES\n" /usr/local/etc/svn_authz.conf
+
+echo "# Repositorio: $PROJETO" >> /usr/local/etc/svn_authz.conf
+echo "[$PROJETO:/]" >> /usr/local/etc/svn_authz.conf
+echo "@admin = rw" >> /usr/local/etc/svn_authz.conf
+echo "@$NOME_GRUPO = rw" >> /usr/local/etc/svn_authz.conf
+echo "" >> /usr/local/etc/svn_authz.conf
 ```
+
+**~# chmod +x cria-projetos**
+
+>_Este comando tonará o script cria-projetos executável._
+
+>_Para executar o script, no diretório /root digite o comando `./cria-projetos`. A execução deste script abrirá uma caixa de diálogo no qual solicitará que seja inserido o nome do projeto a ser criado, assim como o nome de referência para o TRAC, nome(s) e login(s) do(s) usuário(s) pertencentes ao referente projeto. Após a execução do script, será criado o projeto no diretório /var/lib/svn/”nome-projeto” e será adicionado as referências deste projeto no arquivo svn_authz.conf em /usr/local/etc/._
+
+>_•	Pronto, se tudo ocorreu da forma desejada, o SVN está agora configurado e funcionando. Para testar sua efetividade acesse o navegador e insira o seguinte endereço:
+http://IPSERVIDOR/svn/NOME-PROJETO_
+
+>_•	Para se testar a funcionalidade do TRAC, acesse o navegador e insira o seguinte endereço:
+http://IPSERVIDOR/projetos/NOME-PROJETO_
+
+
+## 7. BACKUPS PROJETOS SVN E CONFIGURAÇÕES DO SISTEMA
+### 7.1. Backup SVN
+Agora que o sistema está configurado e funcionando corretamente é necessário configurarmos as rotinas de backup. Para isso, o primeiro passo é criar um script de backup que irá fazer um dump dos projetos SVN e salvá-los em algum dispositivo externo.
+
+Este script tem a função de fazer backup Full para os projetos novos e incremental para os projetos já existente. Por exemplo, a primeira vez que o script for executado, ele criará um backup completo de todos os projetos existentes, e posteriormente criará backups incrementais apenas das modificações de cada projeto. 
+
+Segue abaixo definição do script:
+
+Este script ficará alocado no diretorio /etc/usr/local/bin com o nome 
+~# cd /etc/usr/local/bin

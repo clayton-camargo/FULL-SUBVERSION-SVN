@@ -124,8 +124,8 @@ sed -i '/.type = svn/a .sync_per_request = true' /var/lib/trac/$PROJETO/conf/tra
 echo "[header_logo]" >> /var/lib/trac/$PROJETO/conf/trac.ini 
 echo "alt = MYCOMP" >> /var/lib/trac/$PROJETO/conf/trac.ini 
 echo "height = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini
-echo "link = https://github.com/clayton-camargo" >> /var/lib/trac/$PROJETO/conf/trac.ini
-echo "src = https://icones.pro/wp-content/uploads/2021/06/icone-github-bleu.png" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "link = https://www.linkedin.com/in/clayton-camargo-oliveira-463ba9105/" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "src = https://raw.githubusercontent.com/clayton-camargo/FULL-SUBVERSION-SVN/main/Icone%20clayton.png" >> /var/lib/trac/$PROJETO/conf/trac.ini
 echo "width = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini 
 echo  >> /var/lib/trac/$PROJETO/conf/trac.ini
 
