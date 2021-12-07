@@ -150,7 +150,7 @@ Deve-se criar um arquivo de vínculo entre usuários e projetos no diretório /u
 **~# vi /usr/local/etc/svn_authz.conf**
 ```
 [groups]
-admin =  claytoncamargo #Participantes que terão acesso full a todos os projetos#
+admin =  clayton.camargo #Participantes que terão acesso full a todos os projetos#
  
 #FIM-GRUPOS
 #----------------------------------------------------------------------------------------------------------------
