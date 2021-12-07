@@ -189,7 +189,11 @@ Agora, para criar os projetos deve-se primeiramente criar um script dentro do di
 #!/bin/bash
 
 # Script para gerar o diretorio svn e trac para projeto
-# Autor: CLAYTON CAMARGO
+# Autor: Clayton Camargo
+# Data: 07/12/2021
+# Modificado: 
+# Copyright 2021 Clayton Camargo Oliveira <claytoncamargo.co@gmail.com>
+# All rights reserved.
 
 # Dialog para pegar o nome do projeto
 PROJETO=$( dialog --stdout --inputbox 'Digite o nome do projeto (ex.: DSV-XPTO)' 0 45 )
@@ -480,3 +484,143 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 
 ## 8. RESTAURAÇÃO DE BACKUP
+
+```
+#!/bin/bash
+
+# Script de Restory de backup dos projetos SVN e TRAC
+# Autor: Clayton Camargo
+# Data: 07/12/2021
+# Modificado: 
+# Copyright 2021 Clayton Camargo Oliveira <claytoncamargo.co@gmail.com>
+# All rights reserved.
+
+DIR_BACKUP="/media/hd-externo/svn/"
+DIR_PROJETOS="/var/lib/svn/"
+LIST_PROJETOS="/var/projetos"
+READ_LIST_PROJETOS="$LIST_PROJETOS/svnprojetos.txt"
+
+        if [ ! -e "$LIST_PROJETOS" ]; then
+                mkdir -p "$LIST_PROJETOS"
+        fi
+
+        for projeto in `ls $DIR_BACKUP`; do
+
+	echo "$projeto" >> $LIST_PROJETOS/svnprojetos.txt
+		if [ $? == 0 ]; then
+			echo -n -e " OK!\n"
+		else
+                        echo -n -e " Fail\n"
+fi
+done
+	echo -n -e "\n *** Finalizando leitura de projetos *** \n\n"
+
+
+	for projeto in `cat $READ_LIST_PROJETOS`; do
+
+        svnadmin create $DIR_PROJETOS$projeto
+
+        # Permissoes para o SVN
+        chown -R www-data:www-data $DIR_PROJETOS$projeto
+        chmod -R 770 $DIR_PROJETOS$projeto
+
+                if [ $? == 0 ]; then
+                        echo -n -e " OK!\n"
+                else
+                        echo -n -e " Fail\n"
+fi
+done
+
+        echo -n -e "\n *** Finalizando Criacao dos projetos*** \n\n"
+
+
+	for projeto in `cat $READ_LIST_PROJETOS`; do
+
+        svnadmin load $DIR_PROJETOS$projeto < $DIR_BACKUP$projeto
+                if [ $? == 0 ]; then
+                        echo -n -e " OK!\n"
+                else
+                        echo -n -e " Fail\n"
+fi
+done
+
+	echo -n -e "\n *** Finalizando restauracao dos projetos*** \n\n"
+
+
+	for PROJETO in `cat $READ_LIST_PROJETOS`; do
+	NOME_GRUPO=${PROJETO,,}
+	CAMINHO="/var/lib/svn/$PROJETO"
+	DB="sqlite:db/trac.db"
+	REPOSTYPE=svn
+
+	# Corrigir problemas com nomes de arquivos
+export LC_CTYPE=pt_BR.UTF-8
+
+	# Criando o trac para o projeto
+mkdir -p /var/lib/trac/$PROJETO
+trac-admin /var/lib/trac/$PROJETO initenv "$PROJETO" $DB $REPOSTYPE $CAMINHO
+
+	# Permissoes para o trac
+find /var/lib/trac/$PROJETO -type f -exec chmod 660 {} \;
+find /var/lib/trac/$PROJETO -type d -exec chmod 2770 {} \;
+chown -R www-data.www-data /var/lib/trac/$PROJETO
+
+	# Remove permissoes de anonymous
+trac-admin /var/lib/trac/$PROJETO permission remove anonymous '*'
+trac-admin /var/lib/trac/$PROJETO permission add anonymous WIKI_VIEW CHANGESET_VIEW FILE_VIEW LOG_VIEW MILESTONE_VIEW REPORT_SQL_VIEW REPORT_VIEW ROADMAP_VIEW SEARCH_VIEW TICKET_VIEW TIMELINE_VIEW
+
+	# Permissao de super-usuario para o administrador de TI
+trac-admin /var/lib/trac/$PROJETO permission add claytoncamargo TRAC_ADMIN
+trac-admin /var/lib/trac/$PROJETO permission add heitorpolizeli TRAC_ADMIN
+trac-admin /var/lib/trac/$PROJETO permission add joaovilan TRAC_ADMIN
+
+# Remover milestones padroes
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone1
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone2
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone3
+trac-admin /var/lib/trac/$PROJETO milestone remove milestone4
+
+# Alterando as prioridades padroes
+trac-admin /var/lib/trac/$PROJETO priority change blocker autíssima
+trac-admin /var/lib/trac/$PROJETO priority change critical critica
+trac-admin /var/lib/trac/$PROJETO priority change major alta
+trac-admin /var/lib/trac/$PROJETO priority change minor mínima
+
+# Alterando os tipos de ticket
+trac-admin /var/lib/trac/$PROJETO ticket_type change defect defeito
+trac-admin /var/lib/trac/$PROJETO ticket_type change enhancement etapa
+trac-admin /var/lib/trac/$PROJETO ticket_type change task tarefa
+
+# Removendo componentes
+trac-admin /var/lib/trac/$PROJETO component remove component1
+trac-admin /var/lib/trac/$PROJETO component remove component2
+
+sed -i 25,31d /var/lib/trac/$PROJETO/conf/trac.ini
+sed -i '/.type = svn/a .sync_per_request = true' /var/lib/trac/$PROJETO/conf/trac.ini
+
+echo "[header_logo]" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "alt = MYCOMP" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "height = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "link = https://www.linkedin.com/in/clayton-camargo-oliveira-463ba9105/" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "src = https://raw.githubusercontent.com/clayton-camargo/FULL-SUBVERSION-SVN/main/Icone%20clayton.png" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "width = -5" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo  >> /var/lib/trac/$PROJETO/conf/trac.ini
+
+echo "[components]" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "tracopt.versioncontrol.svn.* = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "trac.versioncontrol.api.repositorymanager = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "trac.versioncontrol.svn_authz.svnauthzoptions = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+echo "trac.versioncontrol.svn_fs.subversionconnector = enabled" >> /var/lib/trac/$PROJETO/conf/trac.ini
+
+# Resincronizando para evitar erros
+trac-admin /var/lib/trac/$PROJETO repository sync "*"
+	
+                if [ $? == 0 ]; then
+                        echo -n -e " OK!\n"
+                else
+                        echo -n -e " Fail\n"
+fi
+done
+
+        echo -n -e "\n *** Finalizando restauracao dos projetos*** \n\n"
+````
