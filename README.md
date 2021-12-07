@@ -337,3 +337,16 @@ echo "@admin = rw" >> /usr/local/etc/svn_authz.conf
 echo "@$NOME_GRUPO = rw" >> /usr/local/etc/svn_authz.conf
 echo "" >> /usr/local/etc/svn_authz.conf
 ```
+
+**~# chmod +x cria-projetos**
+
+>_Este comando tonará o script cria-projetos executável._
+
+>_Para executar o script, no diretório /root digite o comando `./cria-projetos`. A execução deste script abrirá uma caixa de diálogo no qual solicitará que seja inserido o nome do projeto a ser criado, assim como o nome de referência para o TRAC, nome(s) e login(s) do(s) usuário(s) pertencentes ao referente projeto. Após a execução do script, será criado o projeto no diretório /var/lib/svn/”nome-projeto” e será adicionado as referências deste projeto no arquivo svn_authz.conf em /usr/local/etc/._
+
+>_Pronto, se tudo ocorreu da forma desejada, o SVN está agora configurado e funcionando. Para testar sua efetividade acesse o navegador e insira o seguinte endereço:
+http://IPSERVIDOR/svn/NOME-PROJETO_
+
+>_Para se testar a funcionalidade do TRAC, acesse o navegador e insira o seguinte endereço:
+http://IPSERVIDOR/projetos/NOME-PROJETO_
+
