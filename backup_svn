@@ -1,9 +1,9 @@
 #!/bin/sh
 # BACKUP FULL/INCREMENTAL de todos od repositorios Subversion
 # Autor: Clayton Camargo
-# Data: 25/11/2021
+# Data: 07/12/2021
 # Modificado: 
-# Copyright 2021 Clayton Camargo Oliveira <claytoncamargo@chiptronic.com.br>
+# Copyright 2021 Clayton Camargo Oliveira <claytoncamargo.co@gmail.com>
 # All rights reserved.
 
 DIR_SVN=/var/lib/svn #Caminho para o pai de todos os repositórios a serem despejados
