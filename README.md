@@ -357,7 +357,87 @@ Agora que o sistema está configurado e funcionando corretamente é necessário 
 
 Este script tem a função de fazer backup Full para os projetos novos e incremental para os projetos já existente. Por exemplo, a primeira vez que o script for executado, ele criará um backup completo de todos os projetos existentes, e posteriormente criará backups incrementais apenas das modificações de cada projeto. 
 
-Segue abaixo definição do script:
+Este script deverá ser criado no diretorio /etc/usr/local/bin com o nome [`backup_svn`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/backup_svn) e inserido as seguintes informações:
 
-Este script ficará alocado no diretorio /etc/usr/local/bin com o nome 
-~# cd /etc/usr/local/bin
+**~# vi /etc/usr/local/bin/backup_svn**
+```
+#!/bin/sh
+# BACKUP FULL/INCREMENTAL de todos od repositorios Subversion
+# Autor: Clayton Camargo
+# Data: 07/12/2021
+# Modificado: 
+# Copyright 2021 Clayton Camargo Oliveira <claytoncamargo.co@gmail.com>
+# All rights reserved.
+
+DIR_SVN=/var/lib/svn #Caminho para o pai de todos os repositórios a serem despejados
+DIR_BACKUP=/media/hd-externo/svn #Diretório de destino para arquivos de backup
+DIR_STATUS=/var/status/svn #Diretorio de Status
+VAR_SOMA=1 #Variavel para somar em uma string
+DATETIME=`date +%Y%m%d`
+
+	echo -n "\n *** Iniciando o backup dos projetos SVN *** \n\n"
+
+        # Criar diretorios de destino caso ainda nao existam
+        if [ ! -e "$DIR_BACKUP" ]; then
+                mkdir -p "$DIR_BACKUP"
+        fi
+
+        if [ ! -e "$DIR_STATUS/dates/" ]; then
+                mkdir -p "$DIR_STATUS/dates/"
+        fi
+
+	 if [ ! -e "$DIR_STATUS/revisions/" ]; then
+                mkdir -p "$DIR_STATUS/revisions/"
+        fi
+
+for rep in ${DIR_SVN}/*; do
+	TSTAMP=`date +%s`
+	CURR_REV=`svnlook youngest ${rep}` #Coleta a revisão atual
+	REP_BASE=`basename $rep` #Coleta o nome do Projeto
+
+if [ -e ${DIR_STATUS}/dates/${REP_BASE}.dt ] ; then
+	echo "*******************************************************************************************"
+	echo -n "\n *** BACKUP FULL ENCONTRADO, SINCRONIZANDO BACKUP INCREMENTAL PARA $REP_BASE *** \n\n"
+	echo "*******************************************************************************************"	
+else
+        echo "*************************************************************************************"
+        echo -n "\n *** BACKUP FULL NÃO ENCONTRADO, INICIANDO BACKUP FULL PARA $REP_BASE *** \n\n"
+        echo "*************************************************************************************"
+	echo "$(date "+%A, %d de %B de %Y as %T")  - Full backup - ${rep} : "
+	echo " current revision ${CURR_REV}"
+	echo
+	DUMPFILE=${DIR_BACKUP}/${REP_BASE}
+	svnadmin dump -q "$rep" > "${DUMPFILE}"
+	echo ${TSTAMP} > ${DIR_STATUS}/dates/${REP_BASE}.dt
+	echo ${CURR_REV} > ${DIR_STATUS}/revisions/${REP_BASE}.revi
+	REP_LAST_BK_TSTAMP=0
+	REP_LAST_BK_REV=0
+fi
+done
+
+for rep in ${DIR_SVN}/*; do
+        TSTAMP=`date +%s`
+        CURR_REV=`svnlook youngest ${rep}` #Coleta a revisão atual
+        REP_BASE=`basename $rep` #Coleta o nome do Projeto
+if [ -e ${DIR_STATUS}/dates/${REP_BASE}.dt ] ; then
+        REP_LAST_BK_TSTAMP=`cat ${DIR_STATUS}/dates/${REP_BASE}.dt`
+        REP_LAST_BK_REV=`cat ${DIR_STATUS}/revisions/${REP_BASE}.revi`
+	echo $(expr $VAR_SOMA + `cat ${DIR_STATUS}/revisions/${REP_BASE}.revi`) > ${DIR_STATUS}/revisions/${REP_BASE}.rev
+        REP_LAST_BK_INCR=`cat ${DIR_STATUS}/revisions/${REP_BASE}.rev`
+else
+        REP_LAST_BK_TSTAMP=0
+        REP_LAST_BK_REV=0
+fi
+
+if [ ${CURR_REV} -gt ${REP_LAST_BK_REV} ] ; then
+	echo "**********************************************************"
+	echo "$(date "+%A, %d de %B de %Y as %T") - Incremental backup ${rep} : "
+	echo "     oldest revision ${REP_LAST_BK_REV} - newest revision ${CURR_REV}"
+	echo
+	DUMPFILE=${DIR_BACKUP}/${REP_BASE}
+	svnadmin dump -q $rep --incremental -r${REP_LAST_BK_INCR}:${CURR_REV}>> ${DUMPFILE}
+	echo ${TSTAMP} > ${DIR_STATUS}/dates/${REP_BASE}.dt
+	echo ${CURR_REV} > ${DIR_STATUS}/revisions/${REP_BASE}.revi
+fi
+done
+```
