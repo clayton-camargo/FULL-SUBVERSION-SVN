@@ -166,7 +166,10 @@ Para adcionar usuários deve-se criar um script dentro do diretório /root com o
 
 # Script para gerar usuarios e senhas para os sistemas
 # Autor: Clayton Camargo
-# Data: 06/12/2021
+# Data: 07/12/2021
+# Modificado: 
+# Copyright 2021 Clayton Camargo Oliveira <claytoncamargo.co@gmail.com>
+# All rights reserved.
 
 USUARIO=$( dialog --stdout --inputbox 'Digite o nome do usuario(ex.: clayton.camargo)' 0 45 )
 SENHA=$( dialog --stdout --inputbox 'Digite a senha(ex.: yourpass#2021)' 0 45 )
@@ -177,12 +180,12 @@ htpasswd -mb /etc/apache2/dav_svn.passwd $USUARIO $SENHA
 
 >_Este comando tonará o script cria-usuarios executável._
 
->_Para executar o script, no diretório /root digite o comando `./cria-usuarios`. A execução deste script abrirá uma caixa de diálogo no qual deve-se inserir o nome e senha do usuário a ser criado. Ao informar as credenciais do usuário, este será adcionado de forma criptografada ao diretório /etc/apache2/dav_svn.passwd._
+>_Para executar o script, no diretório /root digite o comando ./cria-usuarios. A execução deste script abrirá uma caixa de diálogo em que deve-se inserir o nome e senha do usuário a ser criado. Ao informar as credenciais do usuário, este será adicionado de forma criptografada ao diretório /etc/apache2/dav_svn.passwd._
 
 
 ### 6.3 Script cria projeto
 
-Agora, para criar os projetos deve-se primeiramente criar um script dentro do diretório /root com o nome [`cria-projeto`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/cria-projeto) e adicionar os seguintes parâmetros:
+Agora, para criar os projetos deve-se primeiramente criar um script no diretório /root com o nome [`cria-projeto`](https://github.com/clayton-camargo/FULL-SUBVERSION-SVN/blob/main/cria-projeto) e adicionar os seguintes parâmetros:
 
 **~# vi cria-projeto**
 ```
@@ -346,7 +349,7 @@ echo "" >> /usr/local/etc/svn_authz.conf
 
 >_Este comando tonará o script cria-projetos executável._
 
->_Para executar o script, no diretório /root digite o comando `./cria-projetos`. A execução deste script abrirá uma caixa de diálogo no qual solicitará que seja inserido o nome do projeto a ser criado, assim como o nome de referência para o TRAC, nome(s) e login(s) do(s) usuário(s) pertencentes ao referente projeto. Após a execução do script, será criado o projeto no diretório /var/lib/svn/”nome-projeto” e será adicionado as referências deste projeto no arquivo svn_authz.conf em /usr/local/etc/._
+>_Para executar o script, no diretório /root digite o comando `./cria-projetos`. A execução deste script abrirá uma caixa de diálogo onde solicitará que seja inserido o nome do projeto a ser criado, assim como o nome de referência para o TRAC, nome(s) e login(s) do(s) usuário(s) pertencentes ao referente projeto. Após a execução do script, será criado o projeto no diretório /var/lib/svn/”nome-projeto” e será adicionado as referências deste projeto no arquivo svn_authz.conf em /usr/local/etc/._
 
 >_•	Pronto, se tudo ocorreu da forma desejada, o SVN está agora configurado e funcionando. Para testar sua efetividade acesse o navegador e insira o seguinte endereço:
 http://IPSERVIDOR/svn/NOME-PROJETO_
@@ -453,7 +456,7 @@ done
 
 ### 7.2. Crontab
 
-O Crontab nos permite agendar tarefas para que elas sejam executadas automaticamente. Após a criação do script de backup, devemos introduzir uma chamada do script na Cron, seguindo o exemplo a seguir:
+O Crontab nos permite agendar tarefas para elas serem executadas automaticamente. Após a criação do script de backup, devemos introduzir uma chamada do script na Cron, seguindo o exemplo a seguir:
 
 **~# vi /etc/crontab**
 
